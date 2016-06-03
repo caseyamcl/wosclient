@@ -10,12 +10,14 @@
 This library is a portable REST client for the [DDN Web Object Scalar](http://www.ddn.com/products/object-storage-web-object-scaler-wos/)
 storage system.
 
-Unlike the official DDN PHP solution, this library does not require the installation of
-any PHP extensions.  This library uses the HTTP WOS API.
+Unlike the official DDN PHP client, this library does not require the installation of
+any PHP C extensions.  This library simply uses the HTTP WOS API.
 
 ## Install
 
-This library requires PHP v5.5 or newer.
+This library requires PHP v5.5 or newer.  It has been tested with PHP7.
+
+I also recommend installing the `ext-curl` PHP extension.
 
 Via Composer
 
@@ -23,18 +25,19 @@ Via Composer
 $ composer require caseyamcl/wosclient guzzlehttp/guzzle
 ```
 
-*Note*: For default usage, this library requires [Guzzle v6.0](http://docs.guzzlephp.org/en/latest/index.html).
-However, if you do not wish to use Guzzle 6, you can create your own implementation by only installing
-the `caseyamcl/wosclient` package and implementing `WosClientInterface` yourself.
+*Note*: By default, this library uses [Guzzle v6.0](http://docs.guzzlephp.org/en/latest/index.html).
+However, if you do not wish to use Guzzle 6, you can create your own implementation by implementing
+the `WosClientInterface` yourself (details below).
 
 ## Usage
 
 This library uses [PSR-4 autoloading](http://www.php-fig.org/psr/psr-4/).
-If you are not using Composer or another PSR-4 autoloader, you will need to require all 
-of the files  in the `src/` directory (but I highly discourage this; use an autoloader!).
+If you are not using Composer or another PSR-4 autoloader, you will need to manually include all 
+of the files in the `src/` directory (but I highly discourage this; use an autoloader!).
 
-The simplest way to create the client is to use the `WosClient::build()` constructor.  Pass
-in the URL to your WOS API and your WOS Policy name or ID.
+If you know the URL to your WOS API and your WOS Policy name or ID, you
+can create a `WosClient` instance by calling the `WosClient::build()` constructor.
+Pass in the URL to your WOS API and your WOS Policy name or ID:
 
 ``` php
 
@@ -46,7 +49,7 @@ $wosClient = WosClient::build('http://mywos.example.org/', 'my-policy-id');
 
 The `WosClient` contains four methods:
 
-```
+```php
 
 // Get an object by its Object ID (OID)
 $wosObject = $wosClient->getObject('abcdef-ghijkl-mnopqr-12345');
@@ -71,16 +74,20 @@ $httpResponse = $wosClient->deleteObject('abcdef-ghijkl-mnopqr-12345');
 
 ```
 
-You can pass in custom options for any request.  The last parameter accepted in each of the above methods
-is an array of [Guzzle HTTP request options](http://docs.guzzlephp.org/en/latest/request-options.html).  These will
-override the defaults set in the library, or specified during construction of the service.
+All five methods optionally accept an array of 
+[Guzzle HTTP request options](http://docs.guzzlephp.org/en/latest/request-options.html)
+as the last method parameter.  If you pass any options in this way, they
+will override all default and computed request options.  If you pass in
+HTTP headers in this way, they will be merged with the computed and default
+headers (see [Guzzle Docs](http://docs.guzzlephp.org/en/latest/request-options.html#headers)).
 
 ### Using responses
 
-State-changing operations (`putObject` and `deleteObject`) will simply return a PSR-7 HTTP response, which you should
-not need to use in any way, unless you wish to do something with them.
+State-changing operations (`putObject` and `deleteObject`) simply returns a PSR-7 HTTP response.
+In most cases, you will not need to use this, but it is returned in case you want to get information about
+the response.
 
-The `WosClient::getObject()` method will return an instance of `WosObject`:
+The `WosClient::getObject()` method returns an instance of `WosClient\WosObject`:
 
 ```php
 
@@ -89,6 +96,7 @@ $wosObject = $wosClient->getObject('abcdef-ghijkl-mnopqr-12345');
 
 // Get the data from the response as a string
 $wosObject->getData()->__toString();
+
 // or, as a shortcut..
 $wosObject->__toString();
 
@@ -103,8 +111,8 @@ $wosObject->getHttpResponse();
 ```
 
 
-The `WosClient::getMetadata()` and the `WosObject::getMetadata()` methods will return an instance of
-`WosObjectMetadata`:
+The `WosClient::getMetadata()` and the `WosObject::getMetadata()` methods return an instance of
+`WosClient\WosObjectMetadata`:
 
 ```php
 
@@ -116,11 +124,10 @@ $metadata = $wosObject->getMetadata();
 // getting the content
 $metadata = $wosClient->getMetadata('abcdef-ghijkl-mnopqr-12345');
 
-
 // Get the object ID
 $objectId = $metadata->getObjectId();
 
-// Get the object length (size in bytes)
+// Get the object length (size in bytes) - This returns NULL if not known
 $numBytes = $metadata->getLength();
 
 // Access custom metadata (having been added with `WosObject::putMetadata()`
@@ -146,12 +153,15 @@ $httpResponse = $metadata->getHttpResponse();
 
 ### Streaming large objects
 
+The WOS supports objects up to 5 terabytes in size!
+
 If the object you are retrieving from the WOS server is very large, it is
-probably not a good idea to read the entire thing into memory at once.
+not a good idea to read the entire thing into memory at once.
 
 Fortunately, by default, this library will stream data from the WOS server,
-instead of downloading it into memory.  To accomplish this, the library uses
-the PSR-7 [`StreamableInterface`](http://www.php-fig.org/psr/psr-7/#1-3-streams).  
+instead of downloading it into memory.  The library uses the PSR-7 
+[`StreamableInterface`](http://www.php-fig.org/psr/psr-7/#1-3-streams) to
+accomplish this.
 
 To stream a large file, simply seek through it rather than converting it
 to a string:
@@ -170,8 +180,9 @@ while ( ! $dataStream->eof()) {
 
 ```
 
-Another option is to use the `$range` parameter of the `WosClient::getObject()`
-to retrieve only chunks of the large object at a time:
+Another way to stream data from your WOS server is to specify the `$range` 
+parameter of the `WosClient::getObject()` to retrieve only chunks of the 
+large object at a time:
 
 ```php
 
@@ -183,6 +194,7 @@ for ($i = 0; $i < $metadata->getLength(); $i+= $chunkSize) {
     $from = $i;
     $to   = $i + $chunkSize;
 
+    // WosClient::getObject second parameter accepts range in the format '####-####' (e.g. '1024-2048')
     echo $wosClient->getObject('abcdef-ghijkl-mnopqr-12345', $from . '- . $to)->__toString();
 }
 
@@ -191,8 +203,8 @@ for ($i = 0; $i < $metadata->getLength(); $i+= $chunkSize) {
 ### Handling errors
 
 This library converts any errors that the WOS Server emits into `WosException` exceptions.  The
-exception will contain a code that corresponds to the official DDN API specification, as well as a
-user-friendly message:
+exception will contain a code that corresponds to the official DDN API specification error code,
+as well as a user-friendly message:
 
 ```php
 
@@ -218,7 +230,7 @@ Note that `WosException` is NOT thrown in the case of any HTTP errors.  `WosExce
 thrown in the case that the client successfully connects to the server and receives an HTTP response,
 but WOS couldn't process the request.
 
-You can catch HTTP errors separately, such as 400, 500, connection timeout, etc.  To do this, use GuzzleExceptions:
+You can catch HTTP errors separately, such as 400, 500, connection timeout, etc by catching Guzzle Exceptions:
 
 ```php
 
@@ -243,19 +255,19 @@ catch (GuzzleException $e) {
 ```
 
 The Guzzle library contains a number of different exception classes for specific
-categories of errors, in case you wish to be more specific about your exception handling.
+error cases, in case you wish to be more specific about your exception handling.
 
 ### Instantiating with a custom Guzzle 6 client instance
 
 You may wish to use your own Guzzle 6 Client instance to make requests to the WOS server.
-For example, if you have setup your own middleware, or wish to use custom HTTP defaults (such as
-`connect_timeout`).
+For example, if you have setup your own middleware, or wish to use custom HTTP request 
+default values (such as `connect_timeout`).
 
-To do this, simply use the main constructor for the `WosClient` class instead of the `build()`
+To do this, simply use the main constructor for the `WosClient\WosClient` class instead of the `build()`
 constructor. 
 
-The `base_uri` parameter **MUST** be set when you setup the Guzzle client.  You also may wish to
-set the `x-ddn-policy` header, so that you do not need to set that on the options for each request:
+The `base_uri` parameter **MUST** be set in your Guzzle client class.  You also may wish to
+set the `x-ddn-policy` header, so that you do not need to specify it for each request:
 
 ```php
 
@@ -280,20 +292,22 @@ $wosClient = new WosClient($guzzleClient);
 
 ```
 
-### Using a library besides Guzzle 6
+### Using a HTTP library besides Guzzle 6
 
-For various reasons, you may not be able to use the recommended Guzzle 6 implementation of this library.
-For example, you may wish to use [zend-diactoros](https://github.com/zendframework/zend-diactoros) or an
+You may not be able to use the recommended Guzzle 6 implementation of this library.  For example, 
+you may wish to use [zend-diactoros](https://github.com/zendframework/zend-diactoros) or an
 earlier version of Guzzle.
 
-In order to do this, you must convert any HTTP Responses that these libraries return into PSR-7-compliant
-response objects.  Then, you can create your own implementation of the `WosClient\WosClientInterface` interface.
-That file contains comprehensive documentation for how each method should behave.
+In order to do this, you can create your implementation of the `WosClient\WosClientInterface`.  That file
+contains comprehensive documentation for how each method should behave.
 
-Note that if you do create a custom implementation of `WosClientInterface`, you should throw `WosException` ONLY
-in the case that the `x-ddn-status` response header contains a non 0 status.  HTTP transport exceptions are out
-of the scope of this library, and should be handled independently of these classes.  See *Handling Errors* above
-for tips on how the default implementation handles this case.
+If you do create your implementation, you **MUST** convert any HTTP responses that your HTTP library receives
+into instances of `Psr\Http\Message\ResponseInterface`.
+
+Note that if you do create a custom implementation of `WosClientInterface`, you should throw `WosException` **ONLY**
+in the case that the `x-ddn-status` response header contains a non-0 status.  HTTP transport exceptions are out
+of the scope of this library, and should be thrown independently of the `WosException`.  See *Handling Errors* above
+to see how the default implementation works.
 
 ## Change log
 
@@ -307,7 +321,7 @@ $ composer test
 
 ## Contributing
 
-Please see [CONTRIBUTING](CONTRIBUTING.md) and [CONDUCT](CONDUCT.md) for details.
+Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
 ## Security
 
