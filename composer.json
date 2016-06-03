@@ -1,0 +1,48 @@
+{
+  "name": "caseyamcl/wosclient",
+  "type": "library",
+  "description": "A portable PHP client library to access data in a DDN (WOS) Web Object Scalar API",
+  "keywords": [
+    "caseyamcl",
+    "wosclient",
+    "wos",
+    "ddn",
+    "web object scalar",
+    "storage"
+  ],
+  "homepage": "https://github.com/caseyamcl/wosclient",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Casey McLaughlin",
+      "email": "caseyamcl@gmail.com",
+      "homepage": "http://caseyamcl.com",
+      "role": "Developer"
+    }
+  ],
+  "require": {
+    "php": "~5.5|~7.0",
+    "psr/http-message": "~1.0"
+  },
+  "require-dev": {
+    "guzzlehttp/guzzle": "~6.2",
+
+    "phpunit/phpunit": "~5.4",
+    "scrutinizer/ocular": "~1.1",
+    "squizlabs/php_codesniffer": "~2.3",
+    "mockery/mockery": "~0.9"
+  },
+  "autoload": {
+    "psr-4": {
+      "WosClient\\": "src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "WosClient\\": "tests/WosClient"
+    }
+  },
+  "scripts": {
+    "test": "vendor/bin/phpunit tests"
+  }
+}
