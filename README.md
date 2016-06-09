@@ -84,8 +84,6 @@ HTTP headers in this way, they will be merged with the default headers
 
 ### Using responses
 
-Each of the four methods in `WosClient` return an object:
-
 The `WosClient::getObject()` method returns an instance of `WosClient\WosObject`:
 
 ```php
