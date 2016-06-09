@@ -1,4 +1,4 @@
-# Web Object Scalar (WOS) Client
+# Client for DDN Web Object Scalar (WOS) HTTP API
 
 [![Latest Version on Packagist][ico-version]][link-packagist]
 [![Software License][ico-license]](LICENSE.md)
@@ -8,7 +8,7 @@
 [![Total Downloads][ico-downloads]][link-downloads]
 
 This library is a portable HTTP client for the [DDN Web Object Scalar](http://www.ddn.com/products/object-storage-web-object-scaler-wos/)
-storage system REST API.
+storage system HTTP API.
 
 Unlike the official DDN PHP client, this library communicates with the WOS device
 over HTTP, and does not require the installation of any PHP C extensions.
