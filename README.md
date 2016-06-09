@@ -48,7 +48,7 @@ $wosClient = WosClient::build('http://mywos.example.org/', 'my-policy-id');
 
 ```
 
-The `WosClient` contains four public methods for interacting with the object storage API:
+The `WosClient` contains several public methods for interacting with the object storage API:
 
 ```php
 
@@ -62,20 +62,20 @@ $partialWosObject = $wosClient->getObject('abcdef-ghijkl-mnopqr-12345', '50000-1
 $wosMetadata = $wosClient->getMetadata('abcdef-ghijkl-mnopqr-12345');
 
 // Put an object
-$httpResponse = $wosClient->putObject('some-serializable-or-streamable-data', ['some' => 'metadata']);
+$wosObjectId = $wosClient->putObject('some-serializable-or-streamable-data', ['some' => 'metadata']);
 
 // Reserve an Object ID, without putting any data in it yet
-$reservedObjectId = $wosClient->reserveObject();
+$wosObjectId = $wosClient->reserveObject();
 
 // Put an object having reserved its ID ahead of time with reserveObject()
-$httpResponse = $wosClient->putObject('some-serializable-or-streamable-data', [], $reservedObjectId);
+$wosObjectId = $wosClient->putObject('some-serializable-or-streamable-data', [], $reservedObjectId);
 
 // Delete an object
-$httpResponse = $wosClient->deleteObject('abcdef-ghijkl-mnopqr-12345');
+$wosClient->deleteObject('abcdef-ghijkl-mnopqr-12345');
 
 ```
 
-All four methods optionally accept an array of 
+All of these methods optionally accept an array of 
 [Guzzle HTTP request options](http://docs.guzzlephp.org/en/latest/request-options.html)
 as the last method parameter.  If you pass any options in this way, they
 will override all default and computed request options.  If you pass in
