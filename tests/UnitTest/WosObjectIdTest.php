@@ -39,7 +39,6 @@ class WosObjectIdTest extends PHPUnit_Framework_TestCase
     {
         $obj = new WosObjectId($this->getMockRequest());
         $this->assertEquals('abc-123', $obj->getObjectId());
-        $this->assertInstanceOf('Psr\Http\Message\ResponseInterface', $obj->getHttpResponse());
     }
 
     protected function getMockRequest($withHeader = true)

@@ -17,13 +17,8 @@ use Psr\Http\Message\ResponseInterface;
  *
  * @author Casey McLaughlin <caseyamcl@gmail.com>
  */
-class WosObjectId
+class WosObjectId implements WosObjectIdInterface
 {
-    /**
-     * @var ResponseInterface
-     */
-    private $httpResponse;
-
     /**
      * @var string
      */
@@ -36,21 +31,11 @@ class WosObjectId
      */
     public function __construct(ResponseInterface $httpResponse)
     {
-        $this->httpResponse = $httpResponse;
-
         if (! $httpResponse->hasHeader('x-ddn-oid')) {
             throw new MissingRequiredHeaderException('x-ddn-oid', 'reserve object');
         }
 
         $this->objectId = $httpResponse->getHeaderLine('x-ddn-oid');
-    }
-
-    /**
-     * @return ResponseInterface
-     */
-    public function getHttpResponse()
-    {
-        return $this->httpResponse;
     }
 
     /**

@@ -6,7 +6,7 @@
  * Time: 9:46 AM
  */
 
-namespace WosClient;
+namespace WosClient\Helper;
 
 /**
  * Class ValidateByteRangeTrait

@@ -18,7 +18,7 @@ use Psr\Http\Message\StreamInterface;
  *
  * @author Casey McLaughlin <caseyamcl@gmail.com>
  */
-class WosObject
+class WosObject implements WosObjectInterface
 {
     /**
      * @var StreamInterface
@@ -26,19 +26,14 @@ class WosObject
     private $responseData;
 
     /**
-     * @var array
+     * @var WosObjectMetadata
      */
     private $metadata;
 
     /**
-     * @var string
+     * @var WosObjectId
      */
     private $objectId;
-
-    /**
-     * @var ResponseInterface
-     */
-    private $httpResponse;
 
     /**
      * WosObject constructor.
@@ -51,10 +46,9 @@ class WosObject
             throw new MissingRequiredHeaderException('x-ddn-oid', 'get object');
         }
 
-        $this->httpResponse = $httpResponse;
         $this->responseData = $httpResponse->getBody();
         $this->metadata     = new WosObjectMetadata($httpResponse);
-        $this->objectId     = $httpResponse->getHeaderLine('x-ddn-oid');
+        $this->objectId     = new WosObjectId($httpResponse);
     }
 
     /**
@@ -66,7 +60,7 @@ class WosObject
     }
 
     /**
-     * @return array
+     * @return WosObjectMetadata
      */
     public function getMetadata()
     {
@@ -74,19 +68,11 @@ class WosObject
     }
 
     /**
-     * @return string
+     * @return WosObjectId
      */
     public function getId()
     {
         return $this->objectId;
-    }
-
-    /**
-     * @return ResponseInterface
-     */
-    public function getHttpResponse()
-    {
-        return $this->httpResponse;
     }
 
     /**

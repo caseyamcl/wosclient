@@ -16,7 +16,8 @@ use Psr\Http\Message\ResponseInterface;
  */
 class WosClient implements WosClientInterface
 {
-    use ValidateByteRangeTrait;
+    use Helper\ValidateByteRangeTrait;
+    use Helper\ArrayToMetadataStringTrait;
 
     /**
      * @var Client
@@ -73,13 +74,13 @@ class WosClient implements WosClientInterface
         $options = array_merge_recursive([
             'body'       => $data,
             'headers'    => array_filter([
-                'x-ddn-meta' => $this->prepareMetadata($meta),
+                'x-ddn-meta' => $this->metadataToString($meta),
                 'x-ddn-oid'  => (string) $objectId
             ])
         ], $options);
 
 
-        $resp = $this->request(
+        $resp = $this->sendRequest(
             'post',
             $objectId ? '/cmd/putoid' : '/cmd/put',
             $options
@@ -101,7 +102,7 @@ class WosClient implements WosClientInterface
             ])
         ], $options);
 
-        $resp = $this->request('get', '/objects/' . (string) $objectId, $options);
+        $resp = $this->sendRequest('get', '/objects/' . (string) $objectId, $options);
 
         $this->checkResponse($resp);
         return new WosObject($resp);
@@ -112,7 +113,7 @@ class WosClient implements WosClientInterface
      */
     public function getMetadata($objectId, array $options = [])
     {
-        $resp = $this->request('head', '/objects/' . $objectId, $options);
+        $resp = $this->sendRequest('head', '/objects/' . $objectId, $options);
         $this->checkResponse($resp);
         return new WosObjectMetadata($resp);
 
@@ -130,10 +131,8 @@ class WosClient implements WosClientInterface
             ]
         ], $options);
 
-        $resp = $this->request('post', '/cmd/delete', $options);
-
+        $resp = $this->sendRequest('post', '/cmd/delete', $options);
         $this->checkResponse($resp);
-        return $resp;
     }
 
     /**
@@ -141,7 +140,7 @@ class WosClient implements WosClientInterface
      */
     public function reserveObject(array $options = [])
     {
-        $resp = $this->request('post', '/cmd/reserve', $options);
+        $resp = $this->sendRequest('post', '/cmd/reserve', $options);
 
         $this->checkResponse($resp);
         return new WosObjectId($resp);
@@ -163,7 +162,7 @@ class WosClient implements WosClientInterface
      * @param array  $options
      * @return ResponseInterface
      */
-    private function request($method, $path, array $options = [])
+    public function sendRequest($method, $path, array $options = [])
     {
         try {
             return $this->guzzleClient->request($method, $path, $options);
@@ -195,21 +194,5 @@ class WosClient implements WosClientInterface
         }
     }
 
-    /**
-     * Prepare metadata for DDN header
-     *
-     * Converts array into JSON, and removes surrounding brackets
-     * Returns an empty string for an empty array
-     *
-     * @param array $meta
-     * @return string
-     */
-    private function prepareMetadata(array $meta = [])
-    {
-        return preg_replace(
-            '/^\{(.+?)?\}$/', '$1',
-            json_encode($meta, JSON_FORCE_OBJECT)
-        );
-    }
 
 }

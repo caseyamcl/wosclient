@@ -25,7 +25,7 @@ class WosException extends \RuntimeException
     private static $codeNames  = [
         200 => 'NoNodeForPolicy',
         201 => 'NoNodeForObject',
-        202 => 'UnknownPoilcyName',
+        202 => 'UnknownPolicyName',
         203 => 'InternalError',
         205 => 'InvalidObjId',
         206 => 'NoSpace',

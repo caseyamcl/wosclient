@@ -65,13 +65,13 @@ class WosObjectMetadataTest extends \PHPUnit_Framework_TestCase
         $response->shouldReceive('hasHeader')->with('x-ddn-length')->andReturn(false);
 
         $obj = new WosObjectMetadata($response);
-        $this->assertNull($obj->getLength());
+        $this->assertNull($obj->getObjectSize());
     }
 
     public function testGetLengthReturnsIntegerValueForKnownLength()
     {
         $obj = new WosObjectMetadata($this->getDefaultTestResponse());
-        $this->assertInternalType('integer', $obj->getLength());
+        $this->assertInternalType('integer', $obj->getObjectSize());
     }
 
     public function testArrayAccessMethods()

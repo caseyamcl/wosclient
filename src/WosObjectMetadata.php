@@ -11,23 +11,21 @@ namespace WosClient;
 use Countable;
 use Psr\Http\Message\ResponseInterface;
 use Traversable;
+use WosClient\Helper\ArrayToMetadataStringTrait;
 
 /**
  * Class WosObjectMetadata
  *
  * @author Casey McLaughlin <caseyamcl@gmail.com>
  */
-class WosObjectMetadata implements \ArrayAccess, Countable, \IteratorAggregate
+class WosObjectMetadata implements \IteratorAggregate, WosObjectMetadataInterface
 {
+    use ArrayToMetadataStringTrait;
+
     /**
      * Unknown value
      */
     const UNKNOWN = null;
-
-    /**
-     * @var ResponseInterface
-     */
-    private $httpResponse;
 
     /**
      * @var array
@@ -37,7 +35,7 @@ class WosObjectMetadata implements \ArrayAccess, Countable, \IteratorAggregate
     /**
      * @var int
      */
-    private $length;
+    private $objectSize;
 
     /**
      * WosObjectMetadata constructor.
@@ -46,19 +44,20 @@ class WosObjectMetadata implements \ArrayAccess, Countable, \IteratorAggregate
      */
     public function __construct(ResponseInterface $httpResponse)
     {
-        $this->httpResponse = $httpResponse;
-        $this->metadata     = json_decode('{' . $httpResponse->getHeaderLine('x-ddn-meta') . '}', true);
-        $this->length       = $httpResponse->hasHeader('x-ddn-length')
+        $this->metadata   = json_decode('{' . $httpResponse->getHeaderLine('x-ddn-meta') . '}', true);
+        $this->objectSize = $httpResponse->hasHeader('x-ddn-length')
             ? (int) $httpResponse->getHeaderLine('x-ddn-length')
             : self::UNKNOWN;
     }
 
     /**
-     * @return ResponseInterface
+     * Return representation of the metadata as it would appear as a x-ddn-metadata value
+     *
+     * @return mixed
      */
-    public function getHttpResponse()
+    public function __toString()
     {
-        return $this->httpResponse;
+        return $this->metadataToString($this->toArray());
     }
 
     /**
@@ -92,9 +91,9 @@ class WosObjectMetadata implements \ArrayAccess, Countable, \IteratorAggregate
      *
      * @return int|null
      */
-    public function getLength()
+    public function getObjectSize()
     {
-        return $this->length;
+        return $this->objectSize;
     }
 
     /**

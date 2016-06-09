@@ -48,17 +48,10 @@ class WosObjectTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('abc-123', $obj->getId());
     }
 
-    public function testGetHttpResponseReturnsCorrectObject()
-    {
-        $obj = new WosObject($this->getMockValidResponse());
-        $this->assertInstanceOf('Psr\Http\Message\ResponseInterface', $obj->getHttpResponse());
-    }
-
     public function testGetDataReturnsStreamInterface()
     {
         $obj = new WosObject($this->getMockValidResponse());
-        $this->assertInstanceOf('Psr\Http\Message\StreamInterface', $obj->getHttpResponse()->getBody());
-        $this->assertEquals($obj->getHttpResponse()->getBody(), $obj->getData());
+        $this->assertInstanceOf('Psr\Http\Message\StreamInterface', $obj->getData());
 
     }
 
@@ -66,7 +59,6 @@ class WosObjectTest extends \PHPUnit_Framework_TestCase
     {
         $obj = new WosObject($this->getMockValidResponse());
         $this->assertEquals('abc123', $obj->__toString());
-        $this->assertEquals('abc123', $obj->getHttpResponse()->getBody()->__toString());
     }
 
     protected function getMockValidResponse($includeMetadata = true)

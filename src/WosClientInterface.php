@@ -3,7 +3,6 @@
 namespace WosClient;
 
 use GuzzleHttp\Psr7\Stream;
-use Psr\Http\Message\ResponseInterface;
 
 /**
  * WOS Client Interface
@@ -27,16 +26,26 @@ interface WosClientInterface
      *
      * [
      *    'headers' => [
-     *      'x-ddn-put-on-close'     => true,   // This is FALSE by default; if WOS PUT fails before the request finishes, then put the data anyway
-     *      'x-ddn-put-idle-timeout' => (int)  // This is TRUE by default, but you should set it to false when using '$byteRange' on large objects
+     *      'x-ddn-put-on-close'     => true,
+     *      'x-ddn-put-idle-timeout' => (int)
      *    ]
      * ]
      *
-     * @param string|resource|Stream $data     Specify raw data, a fopen() resource, or a PSR-7 stream
-     * @param array                  $meta     Optionally specify key/value pairs for object metadata
-     * @param string|WosObjectId     $objectId If EMPTY, Object ID (OID) will automatically be assigned
-     * @param array                  $options  Additional request options (see http://docs.guzzlephp.org/en/latest/request-options.html)
-     * @return WosObjectId
+     * * 'x-ddn-put-on-close' (bool)
+     *   This is FALSE by default; set it to TRUE if you wish for the WOS to
+     *   keep the partial written data even if the request fails before it is
+     *   finished
+     *
+     * * 'x-ddn-put-idle-timeout' (int)
+     *   Include this header with a value between 5 and 3600 seconds to specify
+     *   that the connection should automatically be terminated if the server
+     *   has not received any data in the specified number of seconds
+     *
+     * @param string|resource|Stream      $data     Specify raw data, a fopen() resource, or a PSR-7 stream
+     * @param array                       $meta     Optionally specify key/value pairs for object metadata
+     * @param string|WosObjectIdInterface $objectId If EMPTY, Object ID (OID) will automatically be assigned
+     * @param array                       $options  Additional request options (see http://docs.guzzlephp.org/en/latest/request-options.html)
+     * @return WosObjectIdInterface
      * @throws WosException   If WOS server generates an error (x-ddn-status != 0), an exception is thrown
      */
     public function putObject($data, array $meta = [], $objectId = '', array $options = []);
@@ -44,7 +53,8 @@ interface WosClientInterface
     /**
      * Get a WOS object
      *
-     * This gets the WOS object as an entity where the raw data can be streamed.
+     * This gets the WOS object as an entity where the raw data can be
+     * streamed.
      *
      * If you wish to download the object immediately upon calling this method,
      * add ['stream' => false] to the request options
@@ -53,18 +63,32 @@ interface WosClientInterface
      *
      * [
      *    'headers' => [
-     *      'x-ddn-no-meta'         => true,   // By default, metadata is returned with objects.  Specify this to not return metadata (will be an empty array)
-     *      'x-ddn-buffered'        => false,  // This is TRUE by default, but you should set it to false when using '$byteRange' on large objects
-     *      'x-ddn-integrity-check' => false   // This is TRUE by default, but you should set it to false when using '$byteRange' on large objects
+     *      'x-ddn-no-meta'         => true,
+     *      'x-ddn-buffered'        => false,
+     *      'x-ddn-integrity-check' => false
      *    ]
      * ]
      *
+     * * 'x-ddn-no-meta' (bool)
+     *    This is FALSE by default; metadata is returned with objects.
+     *    Set this to TRUE to omit metdata from response (will be an empty array)
+     *
+     * * 'x-ddn-buffered' (bool)
+     *   This is TRUE by default, but you should set it to false when
+     *   using '$byteRange' on large objects
+     *
+     * * 'x-ddn-integrity-check' (bool)
+     *   This is TRUE by default, but you should set it to false when using
+     *   '$byteRange' on large objects
+     *
      * Refer to the DDN WOS API documentation for more details of headers
      *
-     * @param string $objectId   The WOS ObjectID (OID)
-     * @param string $byteRange  Specify byte range (as string "###-###") for partial responses
-     * @param array  $options    Additional request options (see http://docs.guzzlephp.org/en/latest/request-options.html)
-     * @return WosObject
+     * @param string|WosObjectIdInterface $objectId  The WOS ObjectID (OID)
+     * @param string                      $byteRange Specify byte range (as string "###-###") for
+     *                                               partial responses
+     * @param array                       $options   Additional request options (see
+     *                                               http://docs.guzzlephp.org/en/latest/request-options.html)
+     * @return WosObjectInterface
      * @throws WosException   If WOS server generates an error (x-ddn-status != 0), an exception is thrown
      */
     public function getObject($objectId, $byteRange = '', array $options = []);
@@ -72,9 +96,10 @@ interface WosClientInterface
     /**
      * Get metadata for an object
      *
-     * @param string $objectId   The WOS ObjectID (OID)
-     * @param array  $options    Additional request options (see http://docs.guzzlephp.org/en/latest/request-options.html)
-     * @return WosObjectMetadata
+     * @param string|WosObjectIdInterface $objectId  The WOS ObjectID (OID)
+     * @param array                       $options   Additional request options
+     *                                               (see http://docs.guzzlephp.org/en/latest/request-options.html)
+     * @return WosObjectMetadataInterface
      * @throws WosException   If WOS server generates an error (x-ddn-status != 0), an exception is thrown
      */
     public function getMetadata($objectId, array $options = []);
@@ -82,9 +107,9 @@ interface WosClientInterface
     /**
      * Delete an object
      *
-     * @param string $objectId   The WOS ObjectID (OID)
-     * @param array $options
-     * @return ResponseInterface
+     * @param string|WosObjectIdInterface $objectId   The WOS ObjectID (OID)
+     * @param array                       $options    Additional request options
+     *                                               (see http://docs.guzzlephp.org/en/latest/request-options.html)
      * @throws WosException   If WOS server generates an error (x-ddn-status != 0), an exception is thrown
      */
     public function deleteObject($objectId, array $options = []);
@@ -92,8 +117,8 @@ interface WosClientInterface
     /**
      * Reserve an object ID
      *
-     * @param array $options    Additional request options (see http://docs.guzzlephp.org/en/latest/request-options.html)
-     * @return string  The Object ID (OID)
+     * @param array $options  Additional request options (see http://docs.guzzlephp.org/en/latest/request-options.html)
+     * @return string         The Object ID (OID)
      * @return WosObjectId
      * @throws WosException   If WOS server generates an error (x-ddn-status != 0), an exception is thrown
      */

@@ -7,11 +7,11 @@
 [![Quality Score][ico-code-quality]][link-code-quality]
 [![Total Downloads][ico-downloads]][link-downloads]
 
-This library is a portable REST client for the [DDN Web Object Scalar](http://www.ddn.com/products/object-storage-web-object-scaler-wos/)
-storage system.
+This library is a portable HTTP client for the [DDN Web Object Scalar](http://www.ddn.com/products/object-storage-web-object-scaler-wos/)
+storage system REST API.
 
-Unlike the official DDN PHP client, this library does not require the installation of
-any PHP C extensions.  This library simply uses the HTTP WOS API.
+Unlike the official DDN PHP client, this library communicates with the WOS device
+over HTTP, and does not require the installation of any PHP C extensions.
 
 ## Install
 
@@ -47,7 +47,7 @@ $wosClient = WosClient::build('http://mywos.example.org/', 'my-policy-id');
 
 ```
 
-The `WosClient` contains four methods:
+The `WosClient` contains four public methods for interacting with the object storage API:
 
 ```php
 
@@ -74,18 +74,16 @@ $httpResponse = $wosClient->deleteObject('abcdef-ghijkl-mnopqr-12345');
 
 ```
 
-All five methods optionally accept an array of 
+All four methods optionally accept an array of 
 [Guzzle HTTP request options](http://docs.guzzlephp.org/en/latest/request-options.html)
 as the last method parameter.  If you pass any options in this way, they
 will override all default and computed request options.  If you pass in
-HTTP headers in this way, they will be merged with the computed and default
-headers (see [Guzzle Docs](http://docs.guzzlephp.org/en/latest/request-options.html#headers)).
+HTTP headers in this way, they will be merged with the default headers 
+(see [Guzzle Docs](http://docs.guzzlephp.org/en/latest/request-options.html#headers)).
 
 ### Using responses
 
-State-changing operations (`putObject` and `deleteObject`) simply returns a PSR-7 HTTP response.
-In most cases, you will not need to use this, but it is returned in case you want to get information about
-the response.
+Each of the four methods in `WosClient` return an object:
 
 The `WosClient::getObject()` method returns an instance of `WosClient\WosObject`:
 
@@ -102,19 +100,18 @@ $wosObject->__toString();
 
 // Get the Object ID
 $wosObject->getId();
+```
+
+The `WosClient::getMetadata()` and the `WosObject::getMetadata()` methods return an instance of
+`WosClient\WosObjectMetadata`:
+
+```php
 
 // Get the meta-data (instance of WosObjectMetadata; see below)
 $metadata = $wosObject->getMetadata();
 
 // Get access to the HTTP response
 $wosObject->getHttpResponse();
-```
-
-
-The `WosClient::getMetadata()` and the `WosObject::getMetadata()` methods return an instance of
-`WosClient\WosObjectMetadata`:
-
-```php
 
 // Get the metadata from the object
 $wosObject = $wosClient->getObject('abcdef-ghijkl-mnopqr-12345');
@@ -147,9 +144,26 @@ for ($metadata as $key => $val) {
     echo "$key: $val";
 }
 
-// You can also get the raw HTTP response from the metadata
-$httpResponse = $metadata->getHttpResponse();
 ```
+
+The `WosClient::putObject()` and `WosClient::reserveObject()` methods return an instance of `WosClient\WosObjectId`:
+
+```php
+
+// Put an object with auto-generated ID
+$wosObjectId = $wosClient->putObject('some object data');
+
+// Reserve an object ID
+$wosObjectId = $wosClient->reserveObject();
+
+// Get the ID as a string
+$idString = $wosObjectId->getId();
+
+// ..or cast as string..
+$idString = (string) $wosObjectId;
+
+```
+
 
 ### Streaming large objects
 
