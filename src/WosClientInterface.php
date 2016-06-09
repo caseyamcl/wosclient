@@ -56,10 +56,17 @@ interface WosClientInterface
      *   that the connection should automatically be terminated if the server
      *   has not received any data in the specified number of seconds
      *
-     * @param  string|resource|Stream      $data     Specify raw data, a fopen() resource, or a PSR-7 stream
-     * @param  array                       $meta     Optionally specify key/value pairs for object metadata
-     * @param  string|WosObjectIdInterface $objectId If EMPTY, Object ID (OID) will automatically be assigned
-     * @param  array                       $options  Additional request options (see http://docs.guzzlephp.org/en/latest/request-options.html)
+     * @param  string|resource|Stream $data
+     * Specify raw data, fopen() resource, or a PSR-7 stream
+     *
+     * @param  array $meta
+     * Optionally specify key/value pairs for object metadata
+     *
+     * @param  string|WosObjectIdInterface $objectId
+     * If EMPTY, Object ID (OID) will automatically be assigned
+     *
+     * @param  array $options
+     * Additional request options (see http://docs.guzzlephp.org/en/latest/request-options.html)
      * @return WosObjectIdInterface
      * @throws WosServerException   If WOS server generates an error (x-ddn-status != 0), an exception is thrown
      */
@@ -111,9 +118,12 @@ interface WosClientInterface
     /**
      * Get metadata for an object
      *
-     * @param  string|WosObjectIdInterface $objectId The WOS ObjectID (OID)
-     * @param  array                       $options  Additional request options (see http://docs.guzzlephp.org/en/latest/request-options.html)
-     *                                               (see http://docs.guzzlephp.org/en/latest/request-options.html)
+     * @param  string|WosObjectIdInterface $objectId
+     * The WOS ObjectID (OID)
+     *
+     * @param  array $options
+     * Additional request options (see http://docs.guzzlephp.org/en/latest/request-options.html)
+     *
      * @return WosObjectMetadataInterface
      * @throws WosServerException   If WOS server generates an error (x-ddn-status != 0), an exception is thrown
      */
@@ -122,10 +132,14 @@ interface WosClientInterface
     /**
      * Delete an object
      *
-     * @param  string|WosObjectIdInterface $objectId The WOS ObjectID (OID)
-     * @param  array                       $options  Additional request options (see http://docs.guzzlephp.org/en/latest/request-options.html)
-     *                                               (see http://docs.guzzlephp.org/en/latest/request-options.html)
-     * @throws WosServerException   If WOS server generates an error (x-ddn-status != 0), an exception is thrown
+     * @param  string|WosObjectIdInterface $objectId
+     * The WOS ObjectID (OID)
+     *
+     * @param  array $options
+     * Additional request options (see http://docs.guzzlephp.org/en/latest/request-options.html)
+     *
+     * @throws WosServerException
+     * If WOS server generates an error (x-ddn-status != 0), an exception is thrown
      */
     public function deleteObject($objectId, array $options = []);
 

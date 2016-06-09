@@ -16,6 +16,7 @@ over HTTP, and does not require the installation of any PHP C extensions.
 ## Install
 
 This library requires PHP v5.5 or newer.  It has been tested with PHP7.
+If you wish to run tests, you must run v5.6 or newer.
 
 I also recommend installing the `ext-curl` PHP extension.
 

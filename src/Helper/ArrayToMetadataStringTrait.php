@@ -37,9 +37,6 @@ trait ArrayToMetadataStringTrait
      */
     protected function metadataToString(array $meta = [])
     {
-        return preg_replace(
-            '/^\{(.+?)?\}$/', '$1',
-            json_encode($meta, JSON_FORCE_OBJECT)
-        );
+        return preg_replace('/^\{(.+?)?\}$/', '$1', json_encode($meta, JSON_FORCE_OBJECT));
     }
 }

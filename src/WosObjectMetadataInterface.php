@@ -16,7 +16,6 @@
 
 namespace WosClient;
 
-
 /**
  * Class WosObjectMetadata
  *

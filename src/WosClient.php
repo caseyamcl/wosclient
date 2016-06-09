@@ -50,14 +50,12 @@ class WosClient implements WosClientInterface
      */
     public static function build($wosUrl, $wosPolicy = '', array $guzzleOptions = [])
     {
-        $guzzleParams = array_merge_recursive(
-            [
+        $guzzleParams = array_merge_recursive([
             'base_uri' => $wosUrl,
             'headers'  => [
                 'x-ddn-policy' => $wosPolicy
             ]
-            ], $guzzleOptions
-        );
+        ], $guzzleOptions);
 
 
         return new static(new Client($guzzleParams));
@@ -89,17 +87,13 @@ class WosClient implements WosClientInterface
      */
     public function putObject($data, array $meta = [], $objectId = '', array $options = [])
     {
-        $options = array_merge_recursive(
-            [
+        $options = array_merge_recursive([
             'body'       => $data,
-            'headers'    => array_filter(
-                [
+            'headers'    => array_filter([
                 'x-ddn-meta' => $this->metadataToString($meta),
                 'x-ddn-oid'  => (string) $objectId
-                ]
-            )
-            ], $options
-        );
+            ])
+        ], $options);
 
 
         $resp = $this->sendRequest(
@@ -118,15 +112,11 @@ class WosClient implements WosClientInterface
     public function getObject($objectId, $byteRange = '', array $options = [])
     {
         // Add range to options if specified
-        $options = array_merge_recursive(
-            [
-            'headers' => array_filter(
-                [
+        $options = array_merge_recursive([
+            'headers' => array_filter([
                 'range' => $byteRange ? ('bytes=' . $this->validateByteRange($byteRange)) : ''
-                ]
-            )
-            ], $options
-        );
+            ])
+        ], $options);
 
         $resp = $this->sendRequest('get', '/objects/' . (string) $objectId, $options);
 
@@ -151,13 +141,11 @@ class WosClient implements WosClientInterface
     public function deleteObject($objectId, array $options = [])
     {
         // OID is sent in header, not in URI
-        $options = array_merge_recursive(
-            [
+        $options = array_merge_recursive([
             'headers' => [
                 'x-ddn-oid' => (string) $objectId
             ]
-            ], $options
-        );
+        ], $options);
 
         $resp = $this->sendRequest('post', '/cmd/delete', $options);
         $this->checkResponse($resp);
@@ -194,9 +182,7 @@ class WosClient implements WosClientInterface
     {
         try {
             return $this->guzzleClient->request($method, $path, $options);
-        }
-        catch (BadResponseException $e) {
-
+        } catch (BadResponseException $e) {
             throw ($e->getResponse()->hasHeader('x-ddn-status'))
                 ? new WosServerException((int) $e->getResponse()->getHeaderLine('x-ddn-status'))
                 : $e;
@@ -221,6 +207,4 @@ class WosClient implements WosClientInterface
             throw new WosServerException((int) $response->getHeaderLine('x-ddn-status'));
         }
     }
-
-
 }

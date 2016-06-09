@@ -44,7 +44,8 @@
     }
   },
   "scripts": {
-    "test"    : "vendor/bin/phpunit tests",
-    "livetest": "tests/TestLiveServer/runtest.php"
+    "test"    : "php -dzend_extension=xdebug.so vendor/bin/phpunit tests",
+    "livetest": "tests/TestLiveServer/runtest.php",
+    "sniff"   : "vendor/bin/phpcs --standard=psr2 src/"
   }
 }
