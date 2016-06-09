@@ -5,6 +5,8 @@ namespace WosClient;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
 use Psr\Http\Message\ResponseInterface;
+use WosClient\Exception\MissingRequiredHeaderException;
+use WosClient\Exception\WosServerException;
 
 /**
  * WOS Client Implementation for current/latest WOS API
@@ -170,7 +172,7 @@ class WosClient implements WosClientInterface
         catch (BadResponseException $e) {
 
             throw ($e->getResponse()->hasHeader('x-ddn-status'))
-                ? new WosException((int) $e->getResponse()->getHeaderLine('x-ddn-status'))
+                ? new WosServerException((int) $e->getResponse()->getHeaderLine('x-ddn-status'))
                 : $e;
         }
     }
@@ -190,7 +192,7 @@ class WosClient implements WosClientInterface
         }
 
         if ($response->getHeaderLine('x-ddn-status'){0} !== '0') {
-            throw new WosException((int) $response->getHeaderLine('x-ddn-status'));
+            throw new WosServerException((int) $response->getHeaderLine('x-ddn-status'));
         }
     }
 

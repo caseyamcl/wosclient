@@ -20,7 +20,7 @@ class WosObjectTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \WosClient\MissingRequiredHeaderException
+     * @expectedException \WosClient\Exception\MissingRequiredHeaderException
      */
     public function testInstantiateThrowsExceptionIfMissingOidHeader()
     {

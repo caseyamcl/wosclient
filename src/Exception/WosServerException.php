@@ -6,7 +6,7 @@
  * Time: 10:47 AM
  */
 
-namespace WosClient;
+namespace WosClient\Exception;
 
 /**
  * WOS Exceptions are thrown when the WOS returns error codes
@@ -15,8 +15,11 @@ namespace WosClient;
  *
  * @author Casey McLaughlin <caseyamcl@gmail.com>
  */
-class WosException extends \RuntimeException
+class WosServerException extends WosRequestException
 {
+    const UNKNOWN_NAME    = 'UNKNOWN';
+    const UNKNOWN_MEANING = 'Unknown or undocumented WOS error code returned';
+
     /**
      * Code Names Map
      *
@@ -76,7 +79,7 @@ class WosException extends \RuntimeException
     // ---------------------------------------------------------------
 
     /**
-     * WosException constructor.
+     * WosServerException constructor.
      *
      * @param string     $code
      * @param string     $message
@@ -84,14 +87,20 @@ class WosException extends \RuntimeException
      */
     public function __construct($code, $message = '', \Exception $previous = null)
     {
+        // If we get a '0' from the server, and we throw this exception, then
+        // something is wrong in this codebase.
         if ($code == 0) {
-            throw new \RuntimeException('0 DDN code is not an error code (it is the success code)');
-        }
-        if (! array_key_exists($code, static::$codeNames)) {
-            throw new \RuntimeException("Invalid/unknown DDN error code: " . $code);
+            throw new \LogicException('0 DDN code is not an error code (it is the success code)');
         }
 
-        parent::__construct($message ?: static::$codeMeanings[$code], $code, $previous);
+        // Automatically set message if not specified
+        if ( ! $message) {
+            $message = array_key_exists($code, static::$codeMeanings)
+                ? static::$codeMeanings[$code]
+                : static::UNKNOWN_MEANING;
+        }
+
+        parent::__construct($message, $code, $previous);
     }
 
     /**
@@ -101,7 +110,9 @@ class WosException extends \RuntimeException
      */
     public function getErrorName()
     {
-        return static::$codeNames[$this->getCode()];
+        return array_key_exists($this->getCode(), static::$codeNames)
+            ? static::$codeNames[$this->getCode()]
+            : static::UNKNOWN_NAME;
     }
 
     /**
@@ -111,7 +122,9 @@ class WosException extends \RuntimeException
      */
     public function getErrorMeaning()
     {
-        return static::$codeMeanings[$this->getCode()];
+        return array_key_exists($this->getCode(), static::$codeMeanings)
+            ? static::$codeMeanings[$this->getCode()]
+            : static::UNKNOWN_MEANING;
     }
 
     /**

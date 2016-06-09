@@ -8,7 +8,7 @@
 
 namespace WosClient\UnitTest;
 
-use WosClient\MissingRequiredHeaderException;
+use WosClient\Exception\MissingRequiredHeaderException;
 
 /**
  * Class MissingRequiredHeaderExceptionTest

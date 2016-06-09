@@ -25,7 +25,7 @@ class WosObjectIdTest extends PHPUnit_Framework_TestCase
     /**
      * Ensure object does not instantiate succesfully if missing 'x-ddn-oid' header
      *
-     * @expectedException \WosClient\MissingRequiredHeaderException
+     * @expectedException \WosClient\Exception\MissingRequiredHeaderException
      */
     public function testInstantiateFailsWhenMissingOidHeader()
     {

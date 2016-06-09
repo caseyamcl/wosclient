@@ -14,7 +14,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use WosClient\WosClient;
-use WosClient\WosException;
+use WosClient\Exception\WosServerException;
 
 /**
  * Live Test
@@ -58,7 +58,7 @@ class LiveServerTestCommand extends Command
             try {
                 $wosClient->getObject($objId);
             }
-            catch (WosException $e) {
+            catch (WosServerException $e) {
                 $io->success(sprintf('Received appropriate error response for non-existent object: %s (%s)',
                     (string) $objId,
                     (string) $e
@@ -74,7 +74,7 @@ class LiveServerTestCommand extends Command
             try {
                 $wosClient->putObject('should not work', [], $objId);
             }
-            catch (WosException $e) {
+            catch (WosServerException $e) {
                 $io->success(sprintf(
                     'Received appropriate response when attempting to write object ID twice: %s (%s)',
                     (string) $objId,

@@ -6,17 +6,17 @@
  * Time: 3:17 PM
  */
 
-namespace WosClient;
+namespace WosClient\Exception;
 
 /**
- * Class MissingRequiredHeaderException
+ * Missing Header Exception
  *
  * This exception is thrown when a WosClient library expects a header
  * to be present in the HTTP response, but it does not exist
  *
  * @author Casey McLaughlin <caseyamcl@gmail.com>
  */
-class MissingRequiredHeaderException extends \RuntimeException
+class MissingRequiredHeaderException extends WosRequestException
 {
     /**
      * @var string

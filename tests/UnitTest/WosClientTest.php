@@ -15,7 +15,7 @@ use WosClient\WosClient;
 class WosClientTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     *
+     * Test that the build constructor works correctly with valid values
      */
     public function testBuildReturnsValidInstance()
     {
@@ -27,6 +27,10 @@ class WosClientTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('x-ddn-policy', $obj->getHttpClient()->getConfig('headers'));
     }
 
+    /**
+     * Test that the normal constructor works when the Guzzle
+     * client passed in contains 'base_uri' config value
+     */
     public function testConstructCreatesInstanceWithValidGuzzleClient()
     {
         $client = new Client(['base_uri' => 'https://wos.example.org']);
@@ -35,6 +39,9 @@ class WosClientTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test that the normal constructor throws an exception when the Guzzle
+     * client passed in does not contain the required 'base_uri' config value
+     *
      * @expectedException \RuntimeException
      */
     public function testConstructThrowsExceptionWhenMissingBaseUriConfigValue()
@@ -42,5 +49,4 @@ class WosClientTest extends \PHPUnit_Framework_TestCase
         $client = new Client();
         new WosClient($client);
     }
-    
 }

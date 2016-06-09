@@ -8,7 +8,13 @@
 
 namespace WosClient\Helper;
 
-
+/**
+ * Helper to turn an array of key/value pairs into a string
+ *
+ * The resulting string is compatible with the x-ddn-metadata header
+ *
+ * @author Casey McLaughlin <caseyamcl@gmail.com>
+ */
 trait ArrayToMetadataStringTrait
 {
     /**

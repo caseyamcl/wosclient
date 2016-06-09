@@ -9,6 +9,7 @@
 namespace WosClient;
 
 use Psr\Http\Message\ResponseInterface;
+use WosClient\Exception\MissingRequiredHeaderException;
 
 /**
  * Class WosObjectId

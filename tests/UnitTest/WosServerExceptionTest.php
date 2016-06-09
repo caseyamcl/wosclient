@@ -8,37 +8,37 @@
 
 namespace WosClient\UnitTest;
 
-use SebastianBergmann\CodeCoverage\RuntimeException;
-use WosClient\WosException;
+use WosClient\Exception\WosServerException;
 
 /**
- * Class WosExceptionTest
+ * Class WosServerExceptionTest
  *
  * @author Casey McLaughlin <caseyamcl@gmail.com>
  */
-class WosExceptionTest extends \PHPUnit_Framework_TestCase
+class WosServerExceptionTest extends \PHPUnit_Framework_TestCase
 {
     public function testInstantiateSucceedsWithValidErrorCode()
     {
-        $obj = new WosException(200);
-        $this->assertInstanceOf('\WosClient\WosException', $obj);
+        $obj = new WosServerException(200);
+        $this->assertInstanceOf(WosServerException::class, $obj);
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectedException \LogicException
      */
     public function testInstantiateThrowsExceptionWithZeroErrorCode()
     {
-        new WosException(0);
+        new WosServerException(0);
     }
 
     /**
-     * @expectedException RuntimeException
+     * Test that unknown codes work, but throw the 'UNKNOWN' message.
      */
     public function testInstantiateThrowsExceptionWithNonExistentErrorCode()
     {
         $num = rand(223, 1000); // these values do not exist
-        new WosException($num);
+        $exception = new WosServerException($num);
+        $this->assertEquals(WosServerException::UNKNOWN_NAME, $exception->getErrorName());
     }
 
     /**
@@ -48,7 +48,7 @@ class WosExceptionTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetErrorNameReturnsExpectedNameForGivenCode($code, $expected)
     {
-        $obj = new WosException($code);
+        $obj = new WosServerException($code);
         $this->assertEquals($expected, $obj->getErrorName());
     }
 
@@ -59,13 +59,13 @@ class WosExceptionTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetErrorMeaningReturnsExpectedNameForGivenCode($code, $expected)
     {
-        $obj = new WosException($code);
+        $obj = new WosServerException($code);
         $this->assertEquals($expected, $obj->getErrorMeaning());
     }
 
     public function testMessageIsCustomForGivenMessage()
     {
-        $obj = new WosException(220, 'Custom Message');
+        $obj = new WosServerException(220, 'Custom Message');
         $this->assertEquals('Custom Message', $obj->getMessage());
     }
 
@@ -76,7 +76,7 @@ class WosExceptionTest extends \PHPUnit_Framework_TestCase
      */
     public function testMessageIsEqualToMeaningByDefault($code, $expected)
     {
-        $obj = new WosException($code);
+        $obj = new WosServerException($code);
         $this->assertEquals($expected, $obj->getMessage());
     }
 
@@ -87,7 +87,7 @@ class WosExceptionTest extends \PHPUnit_Framework_TestCase
      */
     public function errorMeaningDataProvider()
     {
-        $refl = new \ReflectionClass('\WosClient\WosException');
+        $refl = new \ReflectionClass(WosServerException::class);
         $vals = $refl->getStaticProperties()['codeMeanings'];
 
 
@@ -105,7 +105,7 @@ class WosExceptionTest extends \PHPUnit_Framework_TestCase
      */
     public function errorNameDataProvider()
     {
-        $refl = new \ReflectionClass('\WosClient\WosException');
+        $refl = new \ReflectionClass(WosServerException::class);
         $vals = $refl->getStaticProperties()['codeNames'];
 
         $out = array();
