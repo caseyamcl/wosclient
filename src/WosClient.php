@@ -203,7 +203,8 @@ class WosClient implements WosClientInterface
             throw new InvalidResponseException('x-ddn-status');
         }
 
-        if ($response->getHeaderLine('x-ddn-status'){0} !== '0') {
+        $headerLine = $response->getHeaderLine('x-ddn-status');
+        if ($headerLine{0} !== '0') {
             throw new WosServerException((int) $response->getHeaderLine('x-ddn-status'));
         }
     }
