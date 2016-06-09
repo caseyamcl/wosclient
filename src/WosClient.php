@@ -15,6 +15,8 @@ use Psr\Http\Message\ResponseInterface;
  */
 class WosClient implements WosClientInterface
 {
+    use ValidateByteRangeTrait;
+
     /**
      * @var Client
      */
@@ -69,7 +71,7 @@ class WosClient implements WosClientInterface
     {
         $options = array_filter(array_merge([
             'body'       => $data,
-            'x-ddn-meta' => preg_replace('/\{(.+?)\}/', '$1', json_encode($meta)),
+            'x-ddn-meta' => preg_replace('/^\{(.+?)\}$/', '$1', json_encode($meta)),
             'x-ddn-oid'  => (string) $objectId
         ], $options));
 
@@ -167,17 +169,4 @@ class WosClient implements WosClientInterface
         }
     }
 
-    /**
-     * Verifies that byte range is in ####-#### format
-     *
-     * @param string $byteRange
-     */
-    private function validateByteRange($byteRange)
-    {
-        if (! preg_match('/^(\d+)?-(\d+)?$/', $byteRange)) {
-            throw new \RuntimeException(
-                "Invalid range specification (must be in ###-### format); multiple rangers are not supported"
-            );
-        }
-    }
 }
