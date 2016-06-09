@@ -1,10 +1,19 @@
 <?php
+
 /**
- * Created by PhpStorm.
- * User: casey
- * Date: 6/9/16
- * Time: 12:50 PM
+ * PHP Client for DDN Web Object Scalar (WOS) API
+ *
+ * @package Wosclient
+ * @author  Casey McLaughlin <caseyamcl@gmail.com>
+ * @license http://opensource.org/licenses/MIT MIT
+ * @link    https://github.com/caseyamcl/wosclient
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * ------------------------------------------------------------------
  */
+
 namespace WosClient;
 
 
@@ -18,14 +27,15 @@ interface WosObjectMetadataInterface extends \ArrayAccess, \Traversable, \Counta
     /**
      * Get metadata value by its key
      *
-     * @param string $key
+     * @param  string $key
      * @return mixed
      */
     public function get($key);
 
     /**
      * Check if a metadata value exists for a given key
-     * @param string $key
+     *
+     * @param  string $key
      * @return bool
      */
     public function has($key);
@@ -46,7 +56,7 @@ interface WosObjectMetadataInterface extends \ArrayAccess, \Traversable, \Counta
 
     /**
      * Return representation of the metdata as it would appear as a x-ddn-metadata value
-     * 
+     *
      * @return mixed
      */
     public function __toString();

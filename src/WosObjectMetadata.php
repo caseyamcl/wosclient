@@ -1,9 +1,17 @@
 <?php
+
 /**
- * Created by PhpStorm.
- * User: casey
- * Date: 6/3/16
- * Time: 1:30 PM
+ * PHP Client for DDN Web Object Scalar (WOS) API
+ *
+ * @package Wosclient
+ * @author  Casey McLaughlin <caseyamcl@gmail.com>
+ * @license http://opensource.org/licenses/MIT MIT
+ * @link    https://github.com/caseyamcl/wosclient
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * ------------------------------------------------------------------
  */
 
 namespace WosClient;
@@ -99,15 +107,15 @@ class WosObjectMetadata implements \IteratorAggregate, WosObjectMetadataInterfac
     /**
      * Whether a offset exists
      *
-     * @link  http://php.net/manual/en/arrayaccess.offsetexists.php
-     * @param mixed $offset <p>
+     * @link   http://php.net/manual/en/arrayaccess.offsetexists.php
+     * @param  mixed $offset <p>
      *                      An offset to check for.
      *                      </p>
      * @return boolean true on success or false on failure.
      *                      </p>
      *                      <p>
      *                      The return value will be casted to boolean if non-boolean was returned.
-     * @since 5.0.0
+     * @since  5.0.0
      */
     public function offsetExists($offset)
     {
@@ -117,12 +125,12 @@ class WosObjectMetadata implements \IteratorAggregate, WosObjectMetadataInterfac
     /**
      * Offset to retrieve
      *
-     * @link  http://php.net/manual/en/arrayaccess.offsetget.php
-     * @param mixed $offset <p>
+     * @link   http://php.net/manual/en/arrayaccess.offsetget.php
+     * @param  mixed $offset <p>
      *                      The offset to retrieve.
      *                      </p>
      * @return mixed Can return all value types.
-     * @since 5.0.0
+     * @since  5.0.0
      */
     public function offsetGet($offset)
     {
@@ -132,15 +140,15 @@ class WosObjectMetadata implements \IteratorAggregate, WosObjectMetadataInterfac
     /**
      * Offset to set
      *
-     * @link  http://php.net/manual/en/arrayaccess.offsetset.php
-     * @param mixed $offset <p>
+     * @link   http://php.net/manual/en/arrayaccess.offsetset.php
+     * @param  mixed $offset <p>
      *                      The offset to assign the value to.
      *                      </p>
-     * @param mixed $value  <p>
+     * @param  mixed $value  <p>
      *                      The value to set.
      *                      </p>
      * @return void
-     * @since 5.0.0
+     * @since  5.0.0
      */
     public function offsetSet($offset, $value)
     {
@@ -150,12 +158,12 @@ class WosObjectMetadata implements \IteratorAggregate, WosObjectMetadataInterfac
     /**
      * Offset to unset
      *
-     * @link  http://php.net/manual/en/arrayaccess.offsetunset.php
-     * @param mixed $offset <p>
+     * @link   http://php.net/manual/en/arrayaccess.offsetunset.php
+     * @param  mixed $offset <p>
      *                      The offset to unset.
      *                      </p>
      * @return void
-     * @since 5.0.0
+     * @since  5.0.0
      */
     public function offsetUnset($offset)
     {
@@ -165,10 +173,10 @@ class WosObjectMetadata implements \IteratorAggregate, WosObjectMetadataInterfac
     /**
      * Retrieve an external iterator
      *
-     * @link  http://php.net/manual/en/iteratoraggregate.getiterator.php
+     * @link   http://php.net/manual/en/iteratoraggregate.getiterator.php
      * @return Traversable An instance of an object implementing <b>Iterator</b> or
      *        <b>Traversable</b>
-     * @since 5.0.0
+     * @since  5.0.0
      */
     public function getIterator()
     {
@@ -178,12 +186,12 @@ class WosObjectMetadata implements \IteratorAggregate, WosObjectMetadataInterfac
     /**
      * Count elements of an object
      *
-     * @link  http://php.net/manual/en/countable.count.php
+     * @link   http://php.net/manual/en/countable.count.php
      * @return int The custom count as an integer.
      *        </p>
      *        <p>
      *        The return value is cast to an integer.
-     * @since 5.1.0
+     * @since  5.1.0
      */
     public function count()
     {

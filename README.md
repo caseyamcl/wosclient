@@ -369,8 +369,21 @@ Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recen
 
 ## Testing
 
+To run tests, be sure that you have installed all of the dependencies 
+in the `require-dev` portion of the `composer.json` file.
+
+Run unit tests:
+
 ``` bash
 $ composer test
+```
+
+This library also includes a simple console utility to test the client
+against your own WOS device.  The test suite writes two tiny objects
+to the WOS and then deletes them:
+
+```bash
+$ composer livetest http://your-wos.example.org your-policy-id
 ```
 
 ## Contributing

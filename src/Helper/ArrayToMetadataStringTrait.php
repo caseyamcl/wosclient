@@ -1,9 +1,18 @@
 <?php
+
 /**
- * Created by PhpStorm.
- * User: casey
- * Date: 6/9/16
- * Time: 12:55 PM
+ * PHP Client for DDN Web Object Scalar (WOS) API
+ *
+ * @license http://opensource.org/licenses/MIT
+ * @link    https://github.com/caseyamcl/wosclient
+ * @version 1.0
+ * @package caseyamcl/wosclient
+ * @author  Casey McLaughlin <caseyamcl@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * ------------------------------------------------------------------
  */
 
 namespace WosClient\Helper;
@@ -23,7 +32,7 @@ trait ArrayToMetadataStringTrait
      * Converts array into JSON, and removes surrounding brackets
      * Returns an empty string for an empty array
      *
-     * @param array $meta
+     * @param  array $meta
      * @return string
      */
     protected function metadataToString(array $meta = [])

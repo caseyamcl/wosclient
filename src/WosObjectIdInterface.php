@@ -1,9 +1,17 @@
 <?php
+
 /**
- * Created by PhpStorm.
- * User: casey
- * Date: 6/9/16
- * Time: 12:52 PM
+ * PHP Client for DDN Web Object Scalar (WOS) API
+ *
+ * @package Wosclient
+ * @author  Casey McLaughlin <caseyamcl@gmail.com>
+ * @license http://opensource.org/licenses/MIT MIT
+ * @link    https://github.com/caseyamcl/wosclient
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * ------------------------------------------------------------------
  */
 namespace WosClient;
 
@@ -26,7 +34,7 @@ interface WosObjectIdInterface
 
     /**
      * Convert object ID to string
-     * 
+     *
      * @return string
      */
     public function __toString();

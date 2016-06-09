@@ -1,5 +1,19 @@
 <?php
 
+/**
+ * PHP Client for DDN Web Object Scalar (WOS) API
+ *
+ * @package Wosclient
+ * @author  Casey McLaughlin <caseyamcl@gmail.com>
+ * @license http://opensource.org/licenses/MIT MIT
+ * @link    https://github.com/caseyamcl/wosclient
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * ------------------------------------------------------------------
+ */
+
 namespace WosClient\TestLiveServer;
 
 use Symfony\Component\Console\Application;
@@ -10,7 +24,7 @@ use Symfony\Component\Console\Input\InputInterface;
  *
  * Converts the Symfony Console App into a single-command application, per
  * https://symfony.com/doc/current/components/console/single_command_tool.html
- * 
+ *
  * @author Casey McLaughlin <caseyamcl@gmail.com>
  */
 class LiveServerTestApp extends Application

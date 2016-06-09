@@ -1,5 +1,19 @@
 <?php
 
+/**
+ * PHP Client for DDN Web Object Scalar (WOS) API
+ *
+ * @package Wosclient
+ * @author  Casey McLaughlin <caseyamcl@gmail.com>
+ * @license http://opensource.org/licenses/MIT MIT
+ * @link    https://github.com/caseyamcl/wosclient
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * ------------------------------------------------------------------
+ */
+
 namespace WosClient;
 
 use GuzzleHttp\Client;
@@ -29,19 +43,21 @@ class WosClient implements WosClientInterface
     /**
      * Build a WOS Client from parameters
      *
-     * @param string $wosUrl
-     * @param string $wosPolicy
-     * @param array  $guzzleOptions
+     * @param  string $wosUrl
+     * @param  string $wosPolicy
+     * @param  array  $guzzleOptions
      * @return WosClient
      */
     public static function build($wosUrl, $wosPolicy = '', array $guzzleOptions = [])
     {
-        $guzzleParams = array_merge_recursive([
+        $guzzleParams = array_merge_recursive(
+            [
             'base_uri' => $wosUrl,
             'headers'  => [
                 'x-ddn-policy' => $wosPolicy
             ]
-        ], $guzzleOptions);
+            ], $guzzleOptions
+        );
 
 
         return new static(new Client($guzzleParams));
@@ -73,13 +89,17 @@ class WosClient implements WosClientInterface
      */
     public function putObject($data, array $meta = [], $objectId = '', array $options = [])
     {
-        $options = array_merge_recursive([
+        $options = array_merge_recursive(
+            [
             'body'       => $data,
-            'headers'    => array_filter([
+            'headers'    => array_filter(
+                [
                 'x-ddn-meta' => $this->metadataToString($meta),
                 'x-ddn-oid'  => (string) $objectId
-            ])
-        ], $options);
+                ]
+            )
+            ], $options
+        );
 
 
         $resp = $this->sendRequest(
@@ -98,11 +118,15 @@ class WosClient implements WosClientInterface
     public function getObject($objectId, $byteRange = '', array $options = [])
     {
         // Add range to options if specified
-        $options = array_merge_recursive([
-            'headers' => array_filter([
+        $options = array_merge_recursive(
+            [
+            'headers' => array_filter(
+                [
                 'range' => $byteRange ? ('bytes=' . $this->validateByteRange($byteRange)) : ''
-            ])
-        ], $options);
+                ]
+            )
+            ], $options
+        );
 
         $resp = $this->sendRequest('get', '/objects/' . (string) $objectId, $options);
 
@@ -127,11 +151,13 @@ class WosClient implements WosClientInterface
     public function deleteObject($objectId, array $options = [])
     {
         // OID is sent in header, not in URI
-        $options = array_merge_recursive([
+        $options = array_merge_recursive(
+            [
             'headers' => [
                 'x-ddn-oid' => (string) $objectId
             ]
-        ], $options);
+            ], $options
+        );
 
         $resp = $this->sendRequest('post', '/cmd/delete', $options);
         $this->checkResponse($resp);
@@ -159,9 +185,9 @@ class WosClient implements WosClientInterface
     /**
      * Perform a request
      *
-     * @param string $method
-     * @param string $path
-     * @param array  $options
+     * @param  string $method
+     * @param  string $path
+     * @param  array  $options
      * @return ResponseInterface
      */
     public function sendRequest($method, $path, array $options = [])
