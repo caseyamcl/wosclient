@@ -123,8 +123,8 @@ $metadata = $wosClient->getMetadata('abcdef-ghijkl-mnopqr-12345');
 // Get the object ID
 $objectId = $metadata->getObjectId();
 
-// Get the object length (size in bytes) - This returns NULL if not known
-$numBytes = $metadata->getLength();
+// Get the object size in bytes - This returns NULL if not known
+$numBytes = $metadata->getObjectSize();
 
 // Access custom metadata (having been added with `WosObject::putMetadata()`
 $foo = $metadata->get('foo');
