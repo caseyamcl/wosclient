@@ -224,8 +224,8 @@ This library converts all application-layer runtime errors into instances of
   will be a detailed description of the code that was returned from the server.
 * `WosClient\Exception\InvalidResponseException` - This exception
   is thrown when a HTTP response from the server is missing a HTTP header
-  that is expected to be present.  E.g. when a `getObject()` request does
-  not return 
+  that is expected to be present.  E.g. when a `getObject()` sever response
+  does not include a `x-ddn-oid` header.
 * `WosClient\Exception\InvalidParameterException` - This exception is
   thrown when a provided header value is not in the expected format that
   the WOS requires.  For example, if the `Range` header is not in `###-###`
@@ -298,19 +298,19 @@ error cases, in case you wish to be more specific about your exception handling.
 You may wish to use your own Guzzle 6 Client instance to make requests to the WOS server.
 Some examples of why you may wish to do this include:
 
-* uou have setup your own request/response middleware, or 
+* you have setup your own request/response middleware, or 
 * you wish to use custom HTTP request default values (such as `connect_timeout`), or
-* you wish to gain access to HTTP `Response` objects during the request/response cycle
+* you wish to gain access to HTTP `Response` objects during the request/response cycle.
 
-To do this, simply use the main constructor for the `WosClient\WosClient` class instead of the `build()`
-constructor. 
+To use a custom Guzzle client instance, simply use the main constructor 
+for the `WosClient\WosClient` class instead of the `build()` constructor. 
 
 The `base_uri` parameter **MUST** be set in your Guzzle client class, or the library will
-throw a `RuntimeException` during object construction.  This value must be the URL for 
+throw a `\RuntimeException` during object construction.  This value must be the URL for 
 one of your WOS nodes.
 
 You also may wish to set the `x-ddn-policy` header, so that you do not need to
-specify it for each request:
+specify it in each request:
 
 ```php
 
@@ -330,7 +330,7 @@ $guzzleClient = new GuzzleClient([
     /** ..other guzzle options here.. */
 ]);
 
-
+// Instantiate a new WOS Client
 $wosClient = new WosClient($guzzleClient);
 ```
 
@@ -340,11 +340,11 @@ You may wish to write your own implementation for the interfaces included
 in this library.  The only dependency in this case is that you must include
 the `"psr/http-message": "~1.0"` package.
 
-If your alternative implementation uses a [PSR-7 compliant](http://www.php-fig.org/psr/psr-7/)
+If your implementation uses a [PSR-7 compliant](http://www.php-fig.org/psr/psr-7/)
 HTTP library, you only need to implement the `WosClient\WosClientInterface`.  You can use the
-built-in implementations for all other classes.
+built-in implementations of all other classes.
 
-If, however, your alternative implementation does NOT implement PSR-7, you will
+If, however, your implementation does NOT implement PSR-7, you will
 need to implement the following interfaces:
 
 * `WosClient\WosClientInterface`
@@ -356,7 +356,8 @@ need to implement the following interfaces:
 Each interface file contains pretty good documentation for how its methods should behave.
 
 Note that you should only throw exceptions in specific cases:
-* `WosClient\Exception\WosServerException` - Throw this if the WOS server emits an error code (see WOS API documentation).
+
+* `WosClient\Exception\WosServerException` - Throw this if the WOS server emits an error code (refer to the WOS API documentation).
 * `WosClient\Exception\InvalidParameterException` - Throw this if you validate parameters or HTTP headers on the
   client-side, before sending the request to the server.
 * `WosClient\Exception\InvalidResponseException` - Throw this if the server generates a response that the client does
@@ -364,7 +365,7 @@ Note that you should only throw exceptions in specific cases:
 
 ## Change log
 
-Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recently.
+Please see [CHANGELOG](CHANGELOG.md) for more information about what has changed recently.
 
 ## Testing
 
@@ -383,6 +384,12 @@ to the WOS and then deletes them:
 
 ```bash
 $ composer livetest http://your-wos.example.org your-policy-id
+```
+
+Run the PHP CodeSniffer to detect style errors:
+
+```bash
+$ composer sniff
 ```
 
 ## Contributing
