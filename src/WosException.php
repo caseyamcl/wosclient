@@ -113,4 +113,12 @@ class WosException extends \RuntimeException
     {
         return static::$codeMeanings[$this->getCode()];
     }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return sprintf('%s %s: %s', $this->getCode(), $this->getErrorName(), $this->getErrorMeaning());
+    }
 }

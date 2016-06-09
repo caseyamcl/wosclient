@@ -73,7 +73,7 @@ class WosClient implements WosClientInterface
         $options = array_merge_recursive([
             'body'       => $data,
             'headers'    => array_filter([
-                'x-ddn-meta' => preg_replace('/^\{(.+?)\}$/', '$1', json_encode($meta)),
+                'x-ddn-meta' => $this->prepareMetadata($meta),
                 'x-ddn-oid'  => (string) $objectId
             ])
         ], $options);
@@ -193,6 +193,23 @@ class WosClient implements WosClientInterface
         if ($response->getHeaderLine('x-ddn-status'){0} !== '0') {
             throw new WosException((int) $response->getHeaderLine('x-ddn-status'));
         }
+    }
+
+    /**
+     * Prepare metadata for DDN header
+     *
+     * Converts array into JSON, and removes surrounding brackets
+     * Returns an empty string for an empty array
+     *
+     * @param array $meta
+     * @return string
+     */
+    private function prepareMetadata(array $meta = [])
+    {
+        return preg_replace(
+            '/^\{(.+?)?\}$/', '$1',
+            json_encode($meta, JSON_FORCE_OBJECT)
+        );
     }
 
 }

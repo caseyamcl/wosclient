@@ -14,6 +14,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use WosClient\WosClient;
+use WosClient\WosException;
 
 /**
  * Live Test
@@ -45,15 +46,47 @@ class LiveServerTestCommand extends Command
         $wosClient = WosClient::build($url, $policy);
 
         try {
-            $wosId = $wosClient->putObject('test object', ['foo' => 'bar']);
-            $io->success('Wrote object with ID: ' . $wosId->getObjectId());
+            $objId = $wosClient->putObject('test object', ['foo' => 'bar']);
+            $io->success('Wrote object with ID: ' . (string) $objId);
 
-            $wosObj = $wosClient->getObject($wosId);
+            $wosObj = $wosClient->getObject($objId);
             $io->success("Retrieved object with ID: {$wosObj->getId()}; Data: " . $wosObj->getData());
 
-            $resp = $wosClient->deleteObject($wosId);
-            $io->success('Deleted object with ID: ' . (string) $wosId);
+            $wosClient->deleteObject($objId);
+            $io->success('Deleted object with ID: ' . (string) $objId);
 
+            try {
+                $wosClient->getObject($objId);
+            }
+            catch (WosException $e) {
+                $io->success(sprintf('Received appropriate error response for non-existent object: %s (%s)',
+                    (string) $objId,
+                    (string) $e
+                ));
+            }
+
+            $objId = $wosClient->reserveObject();
+            $io->success('Reserved object ID: ' . (string) $objId);
+
+            $objId = $wosClient->putObject('another test object', ['foo' => 'bar'], $objId);
+            $io->success('Wrote object with previously reserved ID: ' . (string) $objId);
+
+            try {
+                $wosClient->putObject('should not work', [], $objId);
+            }
+            catch (WosException $e) {
+                $io->success(sprintf(
+                    'Received appropriate response when attempting to write object ID twice: %s (%s)',
+                    (string) $objId,
+                    (string) $e
+                ));
+            }
+
+            $metadata = $wosClient->getMetadata($objId);
+            $io->success('Got metadata for object with ID: ' . (string) $objId . '; Data: ' . json_encode($metadata->toArray()));
+
+            $wosClient->deleteObject($objId);
+            $io->success('Deleted object with ID: ' . (string) $objId);
         }
         catch (\Exception $e) {
             $io->error($e->getMessage());
