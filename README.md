@@ -215,7 +215,7 @@ for ($i = 0; $i < $metadata->getLength(); $i+= $chunkSize) {
 ### Handling errors
 
 This library converts all application-layer runtime errors into instances of
-`WosClient\Exception\WosRequestException`.  There are three sub-classes:
+`WosClient\Exception\WosException`.  There are three sub-classes:
 
 * `WosClient\Exception\WosServerException` - This exception is thrown
   when the WOS server rejects the request or encounters an error and returns
