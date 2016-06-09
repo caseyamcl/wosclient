@@ -11,13 +11,13 @@ namespace WosClient;
 use Psr\Http\Message\ResponseInterface;
 
 /**
- * Class WosReservedId
+ * Class WosObjectId
  *
  * Simple value object to represent a response for a WOS reserve OID request
  *
  * @author Casey McLaughlin <caseyamcl@gmail.com>
  */
-class WosReservedId
+class WosObjectId
 {
     /**
      * @var ResponseInterface
@@ -30,7 +30,7 @@ class WosReservedId
     private $objectId;
 
     /**
-     * WosReservedId constructor.
+     * WosObjectId constructor.
      *
      * @param ResponseInterface $httpResponse
      */

@@ -6,10 +6,11 @@
  * Time: 4:38 PM
  */
 
-namespace WosClient;
+namespace WosClient\UnitTest;
 
 
 use GuzzleHttp\Client;
+use WosClient\WosClient;
 
 class WosClientTest extends \PHPUnit_Framework_TestCase
 {
@@ -41,6 +42,5 @@ class WosClientTest extends \PHPUnit_Framework_TestCase
         $client = new Client();
         new WosClient($client);
     }
-
     
 }

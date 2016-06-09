@@ -6,9 +6,10 @@
  * Time: 3:48 PM
  */
 
-namespace WosClient;
+namespace WosClient\UnitTest;
 
 use SebastianBergmann\CodeCoverage\RuntimeException;
+use WosClient\WosException;
 
 /**
  * Class WosExceptionTest

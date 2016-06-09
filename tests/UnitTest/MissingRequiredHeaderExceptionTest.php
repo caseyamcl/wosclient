@@ -6,7 +6,9 @@
  * Time: 3:45 PM
  */
 
-namespace WosClient;
+namespace WosClient\UnitTest;
+
+use WosClient\MissingRequiredHeaderException;
 
 /**
  * Class MissingRequiredHeaderExceptionTest

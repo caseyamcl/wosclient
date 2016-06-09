@@ -3,6 +3,7 @@
 namespace WosClient;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\BadResponseException;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -69,21 +70,23 @@ class WosClient implements WosClientInterface
      */
     public function putObject($data, array $meta = [], $objectId = '', array $options = [])
     {
-        $options = array_filter(array_merge([
+        $options = array_merge_recursive([
             'body'       => $data,
-            'x-ddn-meta' => preg_replace('/^\{(.+?)\}$/', '$1', json_encode($meta)),
-            'x-ddn-oid'  => (string) $objectId
-        ], $options));
+            'headers'    => array_filter([
+                'x-ddn-meta' => preg_replace('/^\{(.+?)\}$/', '$1', json_encode($meta)),
+                'x-ddn-oid'  => (string) $objectId
+            ])
+        ], $options);
 
 
-        $resp = $this->guzzleClient->request(
+        $resp = $this->request(
             'post',
-            $objectId ? '/cmd/put' : '/cmd/putoid',
+            $objectId ? '/cmd/putoid' : '/cmd/put',
             $options
         );
 
         $this->checkResponse($resp);
-        return $resp;
+        return new WosObjectId($resp);
     }
 
     /**
@@ -92,15 +95,16 @@ class WosClient implements WosClientInterface
     public function getObject($objectId, $byteRange = '', array $options = [])
     {
         // Add range to options if specified
-        $options = array_filter(array_merge([
-            'range' => $byteRange ? ('bytes=' . $this->validateByteRange($byteRange)) : ''
-        ], $options));
+        $options = array_merge_recursive([
+            'headers' => array_filter([
+                'range' => $byteRange ? ('bytes=' . $this->validateByteRange($byteRange)) : ''
+            ])
+        ], $options);
 
-        $resp = $this->guzzleClient->get('/objects/' . $objectId, $options);
+        $resp = $this->request('get', '/objects/' . (string) $objectId, $options);
 
         $this->checkResponse($resp);
         return new WosObject($resp);
-
     }
 
     /**
@@ -108,7 +112,7 @@ class WosClient implements WosClientInterface
      */
     public function getMetadata($objectId, array $options = [])
     {
-        $resp = $this->guzzleClient->head('/objects/' . $objectId, $options);
+        $resp = $this->request('head', '/objects/' . $objectId, $options);
         $this->checkResponse($resp);
         return new WosObjectMetadata($resp);
 
@@ -120,11 +124,13 @@ class WosClient implements WosClientInterface
     public function deleteObject($objectId, array $options = [])
     {
         // OID is sent in header, not in URI
-        $options = array_filter(array_merge([
-            'x-ddn-oid' => $objectId
-        ], $options));
+        $options = array_merge_recursive([
+            'headers' => [
+                'x-ddn-oid' => (string) $objectId
+            ]
+        ], $options);
 
-        $resp = $this->guzzleClient->post('/cmd/delete', $options);
+        $resp = $this->request('post', '/cmd/delete', $options);
 
         $this->checkResponse($resp);
         return $resp;
@@ -135,10 +141,10 @@ class WosClient implements WosClientInterface
      */
     public function reserveObject(array $options = [])
     {
-        $resp = $this->guzzleClient->post('/cmd/reserve', $options);
+        $resp = $this->request('post', '/cmd/reserve', $options);
 
         $this->checkResponse($resp);
-        return new WosReservedId($resp);
+        return new WosObjectId($resp);
     }
 
     /**
@@ -147,6 +153,27 @@ class WosClient implements WosClientInterface
     public function getHttpClient()
     {
         return $this->guzzleClient;
+    }
+
+    /**
+     * Perform a request
+     *
+     * @param string $method
+     * @param string $path
+     * @param array  $options
+     * @return ResponseInterface
+     */
+    private function request($method, $path, array $options = [])
+    {
+        try {
+            return $this->guzzleClient->request($method, $path, $options);
+        }
+        catch (BadResponseException $e) {
+
+            throw ($e->getResponse()->hasHeader('x-ddn-status'))
+                ? new WosException((int) $e->getResponse()->getHeaderLine('x-ddn-status'))
+                : $e;
+        }
     }
 
     /**
@@ -164,8 +191,7 @@ class WosClient implements WosClientInterface
         }
 
         if ($response->getHeaderLine('x-ddn-status'){0} !== '0') {
-            list($code, $message) = explode(' ', $response->getHeaderLine('x-ddn-status'), 2);
-            throw new WosException((int) $code, trim($message));
+            throw new WosException((int) $response->getHeaderLine('x-ddn-status'));
         }
     }
 

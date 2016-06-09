@@ -34,9 +34,9 @@ interface WosClientInterface
      *
      * @param string|resource|Stream $data     Specify raw data, a fopen() resource, or a PSR-7 stream
      * @param array                  $meta     Optionally specify key/value pairs for object metadata
-     * @param string|WosReservedId   $objectId If EMPTY, Object ID (OID) will automatically be assigned
+     * @param string|WosObjectId     $objectId If EMPTY, Object ID (OID) will automatically be assigned
      * @param array                  $options  Additional request options (see http://docs.guzzlephp.org/en/latest/request-options.html)
-     * @return ResponseInterface
+     * @return WosObjectId
      * @throws WosException   If WOS server generates an error (x-ddn-status != 0), an exception is thrown
      */
     public function putObject($data, array $meta = [], $objectId = '', array $options = []);
@@ -94,7 +94,7 @@ interface WosClientInterface
      *
      * @param array $options    Additional request options (see http://docs.guzzlephp.org/en/latest/request-options.html)
      * @return string  The Object ID (OID)
-     * @return WosReservedId
+     * @return WosObjectId
      * @throws WosException   If WOS server generates an error (x-ddn-status != 0), an exception is thrown
      */
     public function reserveObject(array $options = []);

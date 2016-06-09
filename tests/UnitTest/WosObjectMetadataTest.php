@@ -6,7 +6,9 @@
  * Time: 4:06 PM
  */
 
-namespace WosClient;
+namespace WosClient\UnitTest;
+
+use WosClient\WosObjectMetadata;
 
 class WosObjectMetadataTest extends \PHPUnit_Framework_TestCase
 {

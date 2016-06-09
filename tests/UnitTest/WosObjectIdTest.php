@@ -1,8 +1,9 @@
 <?php
 
-namespace WosClient;
+namespace WosClient\UnitTest;
 
 use PHPUnit_Framework_TestCase;
+use WosClient\WosObjectId;
 
 /**
  * Created by PhpStorm.
@@ -10,15 +11,15 @@ use PHPUnit_Framework_TestCase;
  * Date: 6/3/16
  * Time: 3:26 PM
  */
-class WosReservedIdTest extends PHPUnit_Framework_TestCase
+class WosObjectIdTest extends PHPUnit_Framework_TestCase
 {
     /**
      * Ensure object instantiates successfully
      */
     public function testInstantiateSucceedsWithValidResponse()
     {
-        $obj = new WosReservedId($this->getMockRequest());
-        $this->assertInstanceOf('WosClient\WosReservedId', $obj);
+        $obj = new WosObjectId($this->getMockRequest());
+        $this->assertInstanceOf(WosObjectId::class, $obj);
     }
 
     /**
@@ -28,7 +29,7 @@ class WosReservedIdTest extends PHPUnit_Framework_TestCase
      */
     public function testInstantiateFailsWhenMissingOidHeader()
     {
-        new WosReservedId($this->getMockRequest(false));
+        new WosObjectId($this->getMockRequest(false));
     }
 
     /**
@@ -36,7 +37,7 @@ class WosReservedIdTest extends PHPUnit_Framework_TestCase
      */
     public function testGettersReturnExpectedValues()
     {
-        $obj = new WosReservedId($this->getMockRequest());
+        $obj = new WosObjectId($this->getMockRequest());
         $this->assertEquals('abc-123', $obj->getObjectId());
         $this->assertInstanceOf('Psr\Http\Message\ResponseInterface', $obj->getHttpResponse());
     }

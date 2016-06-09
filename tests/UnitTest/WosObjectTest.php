@@ -6,8 +6,10 @@
  * Time: 4:25 PM
  */
 
-namespace WosClient;
+namespace WosClient\UnitTest;
 
+
+use WosClient\WosObject;
 
 class WosObjectTest extends \PHPUnit_Framework_TestCase
 {
