@@ -15,7 +15,7 @@ namespace WosClient\Exception;
  *
  * @author Casey McLaughlin <caseyamcl@gmail.com>
  */
-abstract class WosRequestException extends \RuntimeException
+abstract class WosException extends \RuntimeException
 {
     // Pass..
 }

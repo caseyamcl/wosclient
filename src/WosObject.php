@@ -10,7 +10,7 @@ namespace WosClient;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
-use WosClient\Exception\MissingRequiredHeaderException;
+use WosClient\Exception\InvalidResponseException;
 
 /**
  * WosObject
@@ -44,7 +44,7 @@ class WosObject implements WosObjectInterface
     public function __construct(ResponseInterface $httpResponse)
     {
         if (! $httpResponse->hasHeader('x-ddn-oid')) {
-            throw new MissingRequiredHeaderException('x-ddn-oid', 'get object');
+            throw new InvalidResponseException('x-ddn-oid', 'get object');
         }
 
         $this->responseData = $httpResponse->getBody();

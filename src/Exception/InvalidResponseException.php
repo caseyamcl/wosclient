@@ -16,26 +16,26 @@ namespace WosClient\Exception;
  *
  * @author Casey McLaughlin <caseyamcl@gmail.com>
  */
-class MissingRequiredHeaderException extends WosRequestException
+class InvalidResponseException extends WosException
 {
     /**
      * @var string
      */
-    private $headerName;
+    private $parameterName;
 
     /**
-     * MissingRequiredHeaderException constructor.
+     * InvalidResponseException constructor.
      *
-     * @param string $headerName     The header that was expected (e.g. 'x-ddn-oid')
-     * @param string $requestAction  The action name (e.g., 'getMetdata()') to include in the message, if known
+     * @param string $oarameterName The parameter/HTTP header that was expected in the response (e.g. 'x-ddn-oid')
+     * @param string $requestAction The action that was requested, if known (e.g., 'getMetdata()')
      */
-    public function __construct($headerName, $requestAction = '')
+    public function __construct($oarameterName, $requestAction = '')
     {
-        $this->headerName = $headerName;
+        $this->parameterName = $oarameterName;
 
         $message = sprintf(
             "Response did not contain '%s' header. Are you sure that you made a %s to a WOS Server?",
-            $headerName,
+            $oarameterName,
             $requestAction ? $requestAction . ' request' : 'request'
         );
 
@@ -45,8 +45,8 @@ class MissingRequiredHeaderException extends WosRequestException
     /**
      * @return string
      */
-    public function getHeaderName()
+    public function getParameterName()
     {
-        return $this->headerName;
+        return $this->parameterName;
     }
 }

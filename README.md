@@ -164,7 +164,6 @@ $idString = (string) $wosObjectId;
 
 ```
 
-
 ### Streaming large objects
 
 The WOS supports objects up to 5 terabytes in size!
@@ -216,17 +215,32 @@ for ($i = 0; $i < $metadata->getLength(); $i+= $chunkSize) {
 
 ### Handling errors
 
-This library converts any errors that the WOS Server emits into `WosException` exceptions.  The
-exception will contain a code that corresponds to the official DDN API specification error code,
-as well as a user-friendly message:
+This library converts all application-layer runtime errors into instances of
+`WosClient\Exception\WosRequestException`.  There are three sub-classes:
+
+* `WosClient\Exception\WosServerException` - This exception is thrown
+  when the WOS server rejects the request or encounters an error and returns
+  a response with a `x-ddn-status` header other than success (0).  The
+  exception code will correspond to the WOS DDN Status code, and the message
+  will be a detailed description of the code that was returned from the server.
+* `WosClient\Exception\InvalidResponseException` - This exception
+  is thrown when a HTTP response from the server is missing a HTTP header
+  that is expected to be present.  E.g. when a `getObject()` request does
+  not return 
+* `WosClient\Exception\InvalidParameterException` - This exception is
+  thrown when a provided header value is not in the expected format that
+  the WOS requires.  For example, if the `Range` header is not in `###-###`
+  format.  It is thrown before the request is sent to the server.
+
+Example:
 
 ```php
 
-use WosClient\WosException;
+use WosClient\Exception\WosServerException;
 
 try {
    $wosClient->getObject('does-not-exist');
-} catch (WosException $e) {
+} catch (WosServerException $e) {
 
     // WOS User-friendly message, e.g., 'Object cannot be located'
     echo $e->getMessage();
@@ -234,35 +248,44 @@ try {
     // WOS Code, e.g., 207
     echo $e->getCode();
     
-    // WOS Error Name (machine-friendly, uses CamelCase), e.g., ObjNotFound
+    // WOS Error Name (machine-friendly, uses CamelCase), e.g., 'ObjNotFound'
     echo $e->getErrorName();
 }
 
 ```
 
-Note that `WosException` is NOT thrown in the case of any HTTP errors.  `WosException` is only
-thrown in the case that the client successfully connects to the server and receives an HTTP response,
-but WOS couldn't process the request.
+Note that `WosServerException` is ONLY thrown when the server emits a response with
+the `x-ddn-status` header present, and the header is a non-zero value.
 
-You can catch HTTP errors separately, such as 400, 500, connection timeout, etc by catching Guzzle Exceptions:
+It is NOT thrown in the event of any other HTTP transmission error (such as network timeout, or an
+internal WOS server error).  You can catch these types of HTTP errors separately, by catching
+Guzzle exceptions:
 
 ```php
 
-use WosClient\WosException;
+use WosClient\Exception\WosServerException;
+use WosClient\Exception\WosRequestException;
 use GuzzleHttp\Exception\GuzzleException;
 
 try {
    $wosClient->getObject('does-not-exist');
 }
-catch (WosException $e) {
+catch (WosServerException $e) {
 
-    // WOS User-friendly message, e.g., 'Object cannot be located'
+    // WOS Exception thrown by the WOS Client
     echo 'WOS Error: ' . $e->getMessage();
     
 }
+catch (WosRequestException $e) {
+
+    // Some other application exception occurred, such as
+    // the WOS server returned a response that is missing an
+    // expected header (this really should never happen)
+    echo 'Something strange happened: ' . $e->getMessage();
+}
 catch (GuzzleException $e) {
 
-   // HTTP Exception thrown by Guzzle when attempting to connect and get the response
+   // HTTP Exception thrown by Guzzle
    echo 'HTTP Error: ' . $e->getMessage();
 }
 
@@ -274,14 +297,21 @@ error cases, in case you wish to be more specific about your exception handling.
 ### Instantiating with a custom Guzzle 6 client instance
 
 You may wish to use your own Guzzle 6 Client instance to make requests to the WOS server.
-For example, if you have setup your own middleware, or wish to use custom HTTP request 
-default values (such as `connect_timeout`).
+Some examples of why you may wish to do this include:
+
+* uou have setup your own request/response middleware, or 
+* you wish to use custom HTTP request default values (such as `connect_timeout`), or
+* you wish to gain access to HTTP `Response` objects during the request/response cycle
 
 To do this, simply use the main constructor for the `WosClient\WosClient` class instead of the `build()`
 constructor. 
 
-The `base_uri` parameter **MUST** be set in your Guzzle client class.  You also may wish to
-set the `x-ddn-policy` header, so that you do not need to specify it for each request:
+The `base_uri` parameter **MUST** be set in your Guzzle client class, or the library will
+throw a `RuntimeException` during object construction.  This value must be the URL for 
+one of your WOS nodes.
+
+You also may wish to set the `x-ddn-policy` header, so that you do not need to
+specify it for each request:
 
 ```php
 
@@ -303,25 +333,35 @@ $guzzleClient = new GuzzleClient([
 
 
 $wosClient = new WosClient($guzzleClient);
-
 ```
 
-### Using a HTTP library besides Guzzle 6
+### Creating a different WOS Client implementation
 
-You may not be able to use the recommended Guzzle 6 implementation of this library.  For example, 
-you may wish to use [zend-diactoros](https://github.com/zendframework/zend-diactoros) or an
-earlier version of Guzzle.
+You may wish to write your own implementation for the interfaces included
+in this library.  The only dependency in this case is that you must include
+the `"psr/http-message": "~1.0"` package.
 
-In order to do this, you can create your implementation of the `WosClient\WosClientInterface`.  That file
-contains comprehensive documentation for how each method should behave.
+If your alternative implementation uses a [PSR-7 compliant](http://www.php-fig.org/psr/psr-7/)
+HTTP library, you only need to implement the `WosClient\WosClientInterface`.  You can use the
+built-in implementations for all other classes.
 
-If you do create your implementation, you **MUST** convert any HTTP responses that your HTTP library receives
-into instances of `Psr\Http\Message\ResponseInterface`.
+If, however, your alternative implementation does NOT implement PSR-7, you will
+need to implement the following interfaces:
 
-Note that if you do create a custom implementation of `WosClientInterface`, you should throw `WosException` **ONLY**
-in the case that the `x-ddn-status` response header contains a non-0 status.  HTTP transport exceptions are out
-of the scope of this library, and should be thrown independently of the `WosException`.  See *Handling Errors* above
-to see how the default implementation works.
+* `WosClient\WosClientInterface`
+* `WosObjectInterface`
+* `WosObjectIdInterface`
+* `WosObjectMetadataInterface`
+* `Psr\Http\Message\StreamInterface` (hint: [Guzzle Streams](https://github.com/guzzle/streams) does this pretty well)
+
+Each interface file contains pretty good documentation for how its methods should behave.
+
+Note that you should only throw exceptions in specific cases:
+* `WosClient\Exception\WosServerException` - Throw this if the WOS server emits an error code (see WOS API documentation).
+* `WosClient\Exception\InvalidParameterException` - Throw this if you validate parameters or HTTP headers on the
+  client-side, before sending the request to the server.
+* `WosClient\Exception\InvalidResponseException` - Throw this if the server generates a response that the client does
+  not know how to process.  For example, the server does not include a HTTP header that is expected to exist.
 
 ## Change log
 

@@ -8,7 +8,7 @@
 
 namespace WosClient\Helper;
 
-use WosClient\Exception\InvalidHeaderValueException;
+use WosClient\Exception\InvalidParameterException;
 
 /**
  * Helper to validate a byte range header value
@@ -28,7 +28,7 @@ trait ValidateByteRangeTrait
     protected function validateByteRange($byteRange)
     {
         if (! preg_match('/^(\d+)?-(\d+)?$/', $byteRange)) {
-            throw new InvalidHeaderValueException(
+            throw new InvalidParameterException(
                 "Invalid range specification (must be in ###-### format); multiple rangers are not supported"
             );
         }

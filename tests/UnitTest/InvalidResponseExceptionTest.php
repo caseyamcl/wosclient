@@ -8,14 +8,14 @@
 
 namespace WosClient\UnitTest;
 
-use WosClient\Exception\MissingRequiredHeaderException;
+use WosClient\Exception\InvalidResponseException;
 
 /**
- * Class MissingRequiredHeaderExceptionTest
+ * Class InvalidResponseExceptionTest
  *
  * @author Casey McLaughlin <caseyamcl@gmail.com>
  */
-class MissingRequiredHeaderExceptionTest extends \PHPUnit_Framework_TestCase
+class InvalidResponseExceptionTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @param string $headerName
@@ -30,7 +30,7 @@ class MissingRequiredHeaderExceptionTest extends \PHPUnit_Framework_TestCase
             $requestAction ? $requestAction . ' request' : 'request'
         );
 
-        $obj = new MissingRequiredHeaderException($headerName, $requestAction);
+        $obj = new InvalidResponseException($headerName, $requestAction);
         $this->assertEquals($expected, $obj->getMessage());
     }
 

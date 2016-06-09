@@ -23,7 +23,7 @@ interface WosClientInterface
      * If $objectId is NOT specified, then this method wilL POST the object to
      * the server, and the server will return the ID
      *
-     * Common other options you can specify:
+     * Common other Guzzle HTTP options you can specify:
      *
      * [
      *    'headers' => [
@@ -60,7 +60,7 @@ interface WosClientInterface
      * If you wish to download the object immediately upon calling this method,
      * add ['stream' => false] to the request options
      *
-     * Common other options you can specify:
+     * Common other Guzzle HTTP options you can specify:
      *
      * [
      *    'headers' => [

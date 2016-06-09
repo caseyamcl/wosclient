@@ -9,7 +9,7 @@
 namespace WosClient;
 
 use Psr\Http\Message\ResponseInterface;
-use WosClient\Exception\MissingRequiredHeaderException;
+use WosClient\Exception\InvalidResponseException;
 
 /**
  * Class WosObjectId
@@ -33,7 +33,7 @@ class WosObjectId implements WosObjectIdInterface
     public function __construct(ResponseInterface $httpResponse)
     {
         if (! $httpResponse->hasHeader('x-ddn-oid')) {
-            throw new MissingRequiredHeaderException('x-ddn-oid', 'reserve object');
+            throw new InvalidResponseException('x-ddn-oid', 'reserve object');
         }
 
         $this->objectId = $httpResponse->getHeaderLine('x-ddn-oid');

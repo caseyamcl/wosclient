@@ -15,7 +15,7 @@ namespace WosClient\Exception;
  *
  * @author Casey McLaughlin <caseyamcl@gmail.com>
  */
-class WosServerException extends WosRequestException
+class WosServerException extends WosException
 {
     const UNKNOWN_NAME    = 'UNKNOWN';
     const UNKNOWN_MEANING = 'Unknown or undocumented WOS error code returned';
